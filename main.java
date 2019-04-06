@@ -1,38 +1,36 @@
-import java.util.ArrayList;
-import java.util.Scanner;
-
 public class main {
 	private static short state = 0;
 	private static short backupState = 0;
 	private static String options = "- Looking for items \n- Show business hours and location \n- Tracking or cancel orders \n- Rate and leave comments";
-	
-	
 	// A 2D array of keywords/phrases to detect actions for each states.
-	private static String[][] keyword = { { "search", "get", "item", "looking for" }, // Goes from 0 to 1
-			{ "buy", "purchase", "online", "order" }, // Goes from 2 to 3
-			{ "reserve", "keep", "stay", "store" }, // Goes from 2 to 6
-			{ "check", "hours", "location", "business", "time", "address" }, // Goes from 0 to 11
-			{ "order", "cancel", "track", "locat" }, // Goes from 0 to 12
-			{ "track", "follow", "find", "locat", "search", "find" }, // Goes from 13 to 14
-			{ "cancel", "drop", "remove" }, // Goes from 13 to 15
-			{ "comment", "leave", "feedback", "rat" }, // Goes from 0 to 17
-			{ "correct", "right", "yes", "sure", "confirm" }, // Generic correct keywords
+	private static String[][] keyword = { { "search", "get", "item", "look", "find", "bui", "buy" }, // Goes from 0 to 1
+			{ "buy", "bui", "purcha", "purchase", "onlin", "online", "order", "now" }, // Goes from 2 to 3
+			{ "reserv", "reserve", "keep", "store", "later" }, // Goes from 2 to 6
+			{ "check", "hour", "location", "business", "time", "address", "where", "store" }, // Goes from 0 to 11
+			{ "order", "cancel", "track", "locat", "locate" }, // Goes from 0 to 12
+			{ "track", "follow", "find", "locat", "locate", "search" }, // Goes from 13 to 14
+			{ "cancel", "drop", "remov" }, // Goes from 13 to 15
+			{ "comment", "leav", "feedback", "rat" }, // Goes from 0 to 17
+			{ "correct", "right", "ye", "sure", "confirm" }, // Generic correct keywords
 			{ "don't", "do not", "wrong", "not correct", "incorrect", "no" }, // Generic wrong keywords
 			{ "return", "go back", "not what", "not this", "something else", "not looking", "wrong", "no thanks",
 					"no, thanks", "no need"}, // Goes to state = 0; overrides every other conditions except state = 20
-			{ "goodbye", "that's all", "is all", "done", "everything", "good" } };// Goes to state = 20; overrides every
+			{ "goodby", "that's all", "that is all", "this is all", "done", "everyth", "good" } };// Goes to state = 20; overrides every
 																					// other conditions
 	// An array storing generic clothing items
-	public static String[] clothingItems = { "t-shirt", "pants", "jeans", "jacket", "gloves", "shirt", "socks",
-			"sneakers", "boots", "cap", "sweater", "belt", "coat" };
+	public static String[] clothingItems = { "t-shirt", "t shirt", "tshirt", "pant", "jean", "jacket", "glove", "shirt", "sock",
+			"sneaker", "boot", "cap", "sweater", "coat" };
 	// Business times and location
-	public static String info = "\nLocation: 123 J.Doe Street, Kelowna\n" + "Sun: Closed\n" + "Mon: 10 AM to 8 PM\n"
+	public static String[] accessoriesItems = { "wallet", "ear", "necklac", "bracelet", "belt", "ring", "keychain",
+			"glass"};
+	public static String info = "\nClothing and Apparal: 123 J.Doe Street, Kelowna\n" + "Sun: Closed\n" + "Mon: 10 AM to 8 PM\n"
 			+ "Tue: 10 AM to 8 PM\n" + "Wed: 10 AM to 8 PM\n" + "Thu: 10 AM to 8 PM\n" + "Fri: 10 AM to 9 PM\n"
 			+ "Sat: 12 PM to 9 PM\n";
 	// state == 0 is default state
 	// Action group 1: Finding item and subsequent actions on the item
 	// state == 1 is looking for item
-	// state == 2 is choosing to buy an item online or reserve an item
+	// state == 2 is choosing to buy an item online or reserve an item (Clothing)
+	// state == 24 is choosing to buy an item online or reserve an item (Accessories)
 	// state == 3 is purchase online by card no.
 	// state == 4 is acknowledge card no.
 	// state == 18; back to 0
@@ -64,25 +62,14 @@ public class main {
 	// state == 18 is generic confirm
 	// state == 19 is unacknowledged action
 	// state == 20 puts you out of the loop (end)
-
-	public static void main(String[] args) {
-		System.out.println("Hello there, welcome to SuperWet online customer service. How may I help you today?");
-		System.out.println(options);
-		do {
-			respond();
-		} while (state != 20);
-	}
-
-	public static void respond() {
-		Scanner in = new Scanner(System.in);
-		String input = in.nextLine();
-		state = findstate.findState(input);
-		String output = response.findResponse(input);
-		System.out.println(output);
-			
+	
+	public static String respond(String s) {
+		state = findstate.findState(s.toLowerCase());
+		String output = response.findResponse(s);
+		return output;
 	}
 	
-	public static String getKeyWord(int i, int j) {
+	public static String getKeyword(int i, int j) {
 		return keyword[i][j];
 	}
 	public static int keywordLen(int i) {
@@ -102,5 +89,7 @@ public class main {
 		backupState = i;
 	}
 	
-	
+	public static String getOptions() {
+		return options;
+	}
 }
