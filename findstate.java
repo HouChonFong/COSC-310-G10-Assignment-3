@@ -85,9 +85,9 @@ public class findstate {
 			if ((main.getState() == 2 || main.getState() == 24) && input.contains(main.getKeyword(2, i)))
 				return 6;
 		}
-		// From 6 to 7
+		// From 6 to 0
 		if (main.getState() == 6)
-			return 7;
+			return 0;
 		// From 8, 14 to 9
 		if (main.getState() == 8 || main.getState() == 14)
 			return 9;

@@ -1,0 +1,6 @@
+List of features we could extract and implement into other programs:
+	Spell-check by Porter Stemmer can be repeatedly used in another context.
+	The snippet of code used to check synonyms using WordNet can be used to refine speech recognition and making responses.
+	The GUI can be used as a general chat interface.
+	State variables can be used similarly to a large switch with clear-cut conditions and used in conjunction with other conditions. (e.g. state == 5 && item.equals(“boot”))
+	This I/O structure can be implemented in many other places.

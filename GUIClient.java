@@ -76,9 +76,13 @@ public class GUIClient extends Application{
 		Thread thread2 = new Thread(new TCPSender(this));
 		thread.start();
 		thread2.start();
-	   	}   
+		while(thread.isAlive() && thread2.isAlive()) {
+			
+		}
+		}
 	   	public static void main(String args[]){ 
-	   		Application.launch(args); 
+	   		Application.launch(args);
+		   	
 	   	} 
 	   	public void displayText(String s, int i) {
 	   		Label temp = new Label();
@@ -100,9 +104,9 @@ public class GUIClient extends Application{
 	   	}
 }
 class TCPReceiver implements Runnable{
-	private ServerSocket serverSocket;
 	private Socket client;
 	private GUIClient instance;
+	String modifiedSentence;
 	public TCPReceiver(GUIClient s) {
 		instance = s;
 	}
@@ -111,11 +115,10 @@ class TCPReceiver implements Runnable{
 		try {
 			client = instance.socket;
 			BufferedReader inFromServer = new BufferedReader(new InputStreamReader(client.getInputStream()));
-				while(true) {
-					String modifiedSentence;
+				do {
 					modifiedSentence = inFromServer.readLine();
 					instance.displayText(modifiedSentence, 2);
-				}
+				}while(main.getState() != 20);
 			}
 		catch (Exception e) {
 			System.out.println(e);
@@ -129,6 +132,7 @@ class TCPReceiver implements Runnable{
 class TCPSender implements Runnable{
 	private Socket client;
 	private GUIClient instance;
+	DataOutputStream outToServer;
 	public TCPSender(GUIClient s) {
 		instance = s;
 	}
@@ -140,7 +144,7 @@ class TCPSender implements Runnable{
 				if(e.getCode() == KeyCode.ENTER) {
 					String modifiedSentence = instance.textField.getText();
 					try {
-						DataOutputStream outToServer = new DataOutputStream(client.getOutputStream());
+						outToServer = new DataOutputStream(client.getOutputStream());
 						instance.displayText(modifiedSentence, 0);
 						outToServer.writeBytes(modifiedSentence);
 						instance.textField.clear();

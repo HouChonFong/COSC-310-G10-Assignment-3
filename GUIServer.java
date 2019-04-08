@@ -23,13 +23,18 @@ import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 
 public class GUIServer extends Application{
-	VBox vBoxInPane;
+	static VBox vBoxInPane;
 	VBox vBox;
 	HBox hBox;
 	Button button;
 	TextField textField;
 	ScrollPane scrollPane;
-	ServerSocket serverSocket;
+	static ServerSocket serverSocket;
+	static Socket client;
+	static String modifiedSentence;
+	static DataOutputStream outToServer;
+	static BufferedReader inFromServer;
+	static String options = "- Looking for items \n- Show business hours and location \n- Tracking or cancel orders \n- Rate and leave comments";
 	public void start(Stage stage) { 
 		vBoxInPane = new VBox(2);
 		vBox = new VBox(2);
@@ -63,21 +68,36 @@ public class GUIServer extends Application{
 	    stage.setScene(scene); 
 	    stage.setResizable(false);
 	    stage.show();
-	    try {
-			serverSocket = new ServerSocket(6789);
-		}
-		catch(Exception e) {
-			displayText("Server failed to create socket; closing application.", -1);
-			System.exit(0);
-		}
-		displayText("Server socket successfully created.", 1);
-		Thread thread = new Thread(new TCPServer(this));
-		thread.start();
+	    Thread thread = new Thread(new Runnable() {
+	    	public void run() {
+	    		try {
+	    			serverSocket = new ServerSocket(6789);
+	    			client = serverSocket.accept();
+	    			outToServer = new DataOutputStream(client.getOutputStream());
+    				inFromServer = new BufferedReader(new InputStreamReader(client.getInputStream()));
+	    			outToServer.writeBytes("Hello there, welcome to SuperWet online customer service. How may I help you today?");
+	    			outToServer.writeBytes(options);
+	    			while(main.getState() != 20) {
+	    				modifiedSentence = inFromServer.readLine();
+	    				outToServer.writeBytes(main.respond(modifiedSentence));
+	    				}
+	    			}
+	    		catch (Exception e) {
+	    			System.out.println(e);
+	    			e.printStackTrace();
+	    		}
+	    		finally {
+	    			System.exit(0);
+	    		}
+	    	}
+	    });
+	    thread.setDaemon(true);
 	   	}   
 	   	public static void main(String args[]){ 
 	   		Application.launch(args); 
+		    
 	   	} 
-	   	public void displayText(String s, int i) {
+	   	public static void displayText(String s, int i) {
 	   		Label temp = new Label();
 	   		if(i == -1) {
 	   			temp.setFont(Font.font(temp.getFont().getName(), FontPosture.ITALIC, temp.getFont().getSize())); 
@@ -95,36 +115,4 @@ public class GUIServer extends Application{
 	   		temp.setMaxWidth(480);
 	   		vBoxInPane.getChildren().add(temp);
 	   	}
-}
-class TCPServer implements Runnable{
-	private ServerSocket serverSocket;
-	private Socket client;
-	private GUIServer instance;
-	public TCPServer(GUIServer s) {
-		instance = s;
-	}
-	@Override
-	public void run() {
-		try {
-			serverSocket = instance.serverSocket;
-			client = serverSocket.accept();
-			instance.displayText("Server successfully connected with a user.", 1);
-			while(main.getState() != 20) {
-				String modifiedSentence;
-				DataOutputStream outToServer = new DataOutputStream(client.getOutputStream());
-				BufferedReader inFromServer = new BufferedReader(new InputStreamReader(client.getInputStream()));
-				modifiedSentence = inFromServer.readLine();
-				instance.displayText(modifiedSentence, 2);
-				instance.displayText(main.respond(modifiedSentence), 0);
-				outToServer.writeBytes(main.respond(modifiedSentence));
-				}
-			}
-		catch (Exception e) {
-			System.out.println(e);
-			e.printStackTrace();
-		}
-		finally {
-			System.exit(0);
-		}
-	}
 }
